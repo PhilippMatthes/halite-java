@@ -5,10 +5,10 @@ import main.model.GameManager;
 import main.tactics.TargetManager;
 import main.util.Vector2d;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import javax.xml.parsers.ParserConfigurationException;
+import java.io.*;
+import java.text.ParseException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Flock {
@@ -16,16 +16,14 @@ public class Flock {
     private List<Position> boids;
     private List<Position> obstacles;
 
-    private static final double REGROUPING_FACTOR = 5;
-    private static final double REGROUPING_RADIUS = Constants.SPAWN_RADIUS * 3;
-    private static final double BOUNDING_FACTOR = 1;
-    private static final double SEPERATION_DISTANCE = Constants.SPAWN_RADIUS;
-    private static final double SEPERATION_FACTOR = 1;
-    private static final double OBSTACLE_AVOIDANCE_DISTANCE = Constants.SPAWN_RADIUS * 3;
-    private static final double OBSTACLE_AVOIDANCE_FACTOR = 5;
-    private static final double POSITION_TEND_FACTOR = 1;
-
-    private static final int DOCKING_LIMIT = 3;
+    private static double REGROUPING_FACTOR = 5;
+    private static double REGROUPING_RADIUS = Constants.SPAWN_RADIUS * 3;
+    private static double BOUNDING_FACTOR = 1;
+    private static double SEPERATION_DISTANCE = Constants.SPAWN_RADIUS;
+    private static double SEPERATION_FACTOR = 1;
+    private static double OBSTACLE_AVOIDANCE_DISTANCE = Constants.SPAWN_RADIUS * 3;
+    private static double OBSTACLE_AVOIDANCE_FACTOR = 5;
+    private static double POSITION_TEND_FACTOR = 1;
 
     public Flock() {
         boids = new ArrayList<>();
@@ -190,6 +188,50 @@ public class Flock {
         tend.division(POSITION_TEND_FACTOR);
 
         return tend;
+    }
+
+    public static void loadProperties() throws IOException {
+        Properties props = new Properties();
+        InputStream is;
+
+        File f = new File("flock.properties");
+        is = new FileInputStream(f);
+        props.load(is);
+
+        try {
+            REGROUPING_FACTOR = Double.parseDouble(props.getProperty("REGROUPING_FACTOR", ""));
+            REGROUPING_RADIUS = Double.parseDouble(props.getProperty("REGROUPING_RADIUS", ""));
+            BOUNDING_FACTOR = Double.parseDouble(props.getProperty("BOUNDING_FACTOR", ""));
+            SEPERATION_DISTANCE = Double.parseDouble(props.getProperty("SEPERATION_DISTANCE", ""));
+            SEPERATION_FACTOR = Double.parseDouble(props.getProperty("SEPERATION_FACTOR", ""));
+            OBSTACLE_AVOIDANCE_DISTANCE = Double.parseDouble(props.getProperty("OBSTACLE_AVOIDANCE_DISTANCE", ""));
+            OBSTACLE_AVOIDANCE_FACTOR = Double.parseDouble(props.getProperty("OBSTACLE_AVOIDANCE_FACTOR", ""));
+            POSITION_TEND_FACTOR = Double.parseDouble(props.getProperty("POSITION_TEND_FACTOR", ""));
+        } catch (NumberFormatException e) {
+            Log.log(Arrays.toString(e.getStackTrace()));
+        }
+        is.close();
+    }
+
+    public void storeProperties() {
+        try {
+            Properties props = new Properties();
+            props.setProperty("REGROUPING_FACTOR", String.format("%s", REGROUPING_FACTOR));
+            props.setProperty("REGROUPING_RADIUS", String.format("%s", REGROUPING_RADIUS));
+            props.setProperty("BOUNDING_FACTOR", String.format("%s", BOUNDING_FACTOR));
+            props.setProperty("SEPERATION_DISTANCE", String.format("%s", SEPERATION_DISTANCE));
+            props.setProperty("SEPERATION_FACTOR", String.format("%s", SEPERATION_FACTOR));
+            props.setProperty("OBSTACLE_AVOIDANCE_DISTANCE", String.format("%s", OBSTACLE_AVOIDANCE_DISTANCE));
+            props.setProperty("OBSTACLE_AVOIDANCE_FACTOR", String.format("%s", OBSTACLE_AVOIDANCE_FACTOR));
+            props.setProperty("POSITION_TEND_FACTOR", String.format("%s", POSITION_TEND_FACTOR));
+
+            File f = new File("flock.properties");
+            OutputStream out = new FileOutputStream( f );
+            props.store(out, "This is the Flock Properties File used for Reinforcement Learning!");
+        }
+        catch (Exception e ) {
+            Log.log(Arrays.toString(e.getStackTrace()));
+        }
     }
 
 }
