@@ -4,7 +4,9 @@ package main.model;
 import hlt.*;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The GameManager is a singleton class holding all relevant information
@@ -65,5 +67,33 @@ public class GameManager {
      */
     public GameMap getGameMap() {
         return gameMap;
+    }
+
+
+    public static List<Planet> getFreePlanets(Position position) {
+        return GameManager.getSharedInstance().getGameMap().getAllPlanets().values().stream()
+                .filter(planet -> !planet.isOwned())
+                .sorted(Comparator.comparing(planet -> planet.getDistanceTo(position)))
+                .collect(Collectors.toList());
+    }
+
+    public static List<Planet> getAvailablePlanets(Position position) {
+        return GameManager.getSharedInstance().getGameMap().getAllPlanets().values().stream()
+                .filter(planet -> planet.getOwner() != GameManager.getSharedInstance().getGameMap().getMyPlayerId())
+                .sorted(Comparator.comparing(planet -> planet.getDistanceTo(position)))
+                .collect(Collectors.toList());
+    }
+
+    public static List<Planet> getAllPlanets(Position position) {
+        return GameManager.getSharedInstance().getGameMap().getAllPlanets().values().stream()
+                .sorted(Comparator.comparing(planet -> planet.getDistanceTo(position)))
+                .collect(Collectors.toList());
+    }
+
+    public static List<Ship> getEnemyShips(Position position) {
+        return GameManager.getSharedInstance().getGameMap().getAllShips().stream()
+                .filter(ship -> ship.getOwner() != GameManager.getSharedInstance().getGameMap().getMyPlayerId())
+                .sorted(Comparator.comparing(ship -> ship.getDistanceTo(position)))
+                .collect(Collectors.toList());
     }
 }

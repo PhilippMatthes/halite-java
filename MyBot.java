@@ -21,12 +21,10 @@ public class MyBot {
 
         Flock flock = new Flock();
 
-        for (Ship ship : gameMap.getMyPlayer().getShips().values()) {
-            flock.addShip(ship);
-        }
-
         while(true) {
             manager.prepareForNextMove();
+            flock.updateShips();
+            flock.updateObstacles();
 
             Networking.sendMoves(flock.planMoves());
         }

@@ -2,11 +2,11 @@ import hlt.*;
 
 import java.util.ArrayList;
 
-public class MyBotOld {
+public class StarterBot {
 
     public static void main(final String[] args) {
         final Networking networking = new Networking();
-        final GameMap gameMap = networking.initialize("Spaceinvader-V1");
+        final GameMap gameMap = networking.initialize("StarterBot");
 
         // We now have 1 full minute to analyse the initial map.
         final String initialMapIntelligence =
