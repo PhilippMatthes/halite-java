@@ -51,5 +51,6 @@ def play_games(binary, map_width, map_height, bot_commands, number_of_runs):
         winner = _determine_winner(match_output)
         result[winner] = result.setdefault(winner, 0) + 1
         winners.append(winner)
+        print("Finished current run: "+str(current_run)+"/"+str(number_of_runs)+" with result: "+str(result))
 
     return winners

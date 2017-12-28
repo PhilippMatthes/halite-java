@@ -16,6 +16,8 @@ public class Flock {
     private List<Position> boids;
     private List<Position> obstacles;
 
+    private static boolean REINFORCEMENT_LEARNING = true;
+
     private static double REGROUPING_FACTOR = 5;
     private static double REGROUPING_RADIUS = Constants.SPAWN_RADIUS * 3;
     private static double BOUNDING_FACTOR = 1;
@@ -28,6 +30,11 @@ public class Flock {
     public Flock() {
         boids = new ArrayList<>();
         obstacles = new ArrayList<>();
+        try{
+            loadProperties();
+        } catch (IOException e) {
+            Log.log(Arrays.toString(e.getStackTrace()));
+        }
     }
 
     public void updateShips() {
@@ -193,8 +200,12 @@ public class Flock {
     public static void loadProperties() throws IOException {
         Properties props = new Properties();
         InputStream is;
-
-        File f = new File("flock.properties");
+        File f;
+        if (REINFORCEMENT_LEARNING) {
+            f = new File("bot"+GameManager.getSharedInstance().getGameMap().getMyPlayerId()+".properties");
+        } else {
+            f = new File("flock.properties");
+        }
         is = new FileInputStream(f);
         props.load(is);
 
@@ -225,7 +236,13 @@ public class Flock {
             props.setProperty("OBSTACLE_AVOIDANCE_FACTOR", String.format("%s", OBSTACLE_AVOIDANCE_FACTOR));
             props.setProperty("POSITION_TEND_FACTOR", String.format("%s", POSITION_TEND_FACTOR));
 
-            File f = new File("flock.properties");
+            File f;
+            if (REINFORCEMENT_LEARNING) {
+                f = new File("bot"+GameManager.getSharedInstance().getGameMap().getMyPlayerId()+".properties");
+            } else {
+                f = new File("flock.properties");
+            }
+
             OutputStream out = new FileOutputStream( f );
             props.store(out, "This is the Flock Properties File used for Reinforcement Learning!");
         }

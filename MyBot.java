@@ -21,8 +21,6 @@ public class MyBot {
 
         Flock flock = new Flock();
 
-        flock.storeProperties();
-
         while(true) {
             manager.prepareForNextMove();
             flock.updateShips();
