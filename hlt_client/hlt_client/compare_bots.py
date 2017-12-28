@@ -45,9 +45,11 @@ def play_games(binary, map_width, map_height, bot_commands, number_of_runs):
     result = {}
     if not(len(bot_commands) == 4 or len(bot_commands) == 2):
         raise IndexError("The number of bots specified must be either 2 or 4.")
+    winners = []
     for current_run in range(0, number_of_runs):
         match_output = _play_game(binary, map_width, map_height, bot_commands)
         winner = _determine_winner(match_output)
         result[winner] = result.setdefault(winner, 0) + 1
-        print("Finished {} runs.".format(current_run + 1))
-        print("Win Ratio: {}".format(result))
+        winners.append(winner)
+
+    return winners
