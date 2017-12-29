@@ -27,11 +27,11 @@ public class Flock {
     private static double OBSTACLE_AVOIDANCE_FACTOR = 5;
     private static double POSITION_TEND_FACTOR = 1;
 
-    public Flock() {
+    public Flock(String standardLocation) {
         boids = new ArrayList<>();
         obstacles = new ArrayList<>();
         try{
-            loadProperties();
+            loadProperties(standardLocation);
         } catch (IOException e) {
             Log.log(Arrays.toString(e.getStackTrace()));
         }
@@ -92,15 +92,7 @@ public class Flock {
 
             Vector2d targetVector = new Vector2d(getPositionAsVector(ship).add(sum));
 
-            Move moveTowardsTarget = Navigation.navigateShipTowardsTarget(
-                    GameManager.getSharedInstance().getGameMap(),
-                    ship,
-                    new Position(targetVector.xPos, targetVector.yPos),
-                    Constants.MAX_SPEED,
-                    true,
-                    Constants.MAX_NAVIGATION_CORRECTIONS - 1,
-                    Math.PI/180.0
-            );
+            Move moveTowardsTarget = createMoveForTarget(targetVector, ship);
 
             if (moveTowardsTarget != null) {
                 TargetManager.getSharedInstance().getTargets().put(ship, entity);
@@ -112,6 +104,38 @@ public class Flock {
         TargetManager.getSharedInstance().getTargets().clear();
 
         return plannedMoves;
+    }
+
+    private Move createMoveForTarget(Vector2d targetVector, Ship ship) {
+        Move moveTowardsTarget = Navigation.navigateShipTowardsTarget(
+                GameManager.getSharedInstance().getGameMap(),
+                ship,
+                new Position(targetVector.xPos, targetVector.yPos),
+                Constants.MAX_SPEED,
+                true,
+                Constants.MAX_NAVIGATION_CORRECTIONS - 1,
+                Math.PI/180.0
+        );
+
+        if (moveTowardsTarget != null) {
+            return moveTowardsTarget;
+        } else {
+            moveTowardsTarget = Navigation.navigateShipTowardsTarget(
+                    GameManager.getSharedInstance().getGameMap(),
+                    ship,
+                    new Position(targetVector.xPos, targetVector.yPos),
+                    Constants.MAX_SPEED,
+                    false,
+                    Constants.MAX_NAVIGATION_CORRECTIONS - 1,
+                    Math.PI/180.0
+            );
+
+            if (moveTowardsTarget != null) {
+                return moveTowardsTarget;
+            } else {
+                return null;
+            }
+        }
     }
 
     private Vector2d getPositionAsVector(Position position) {
@@ -197,14 +221,14 @@ public class Flock {
         return tend;
     }
 
-    public static void loadProperties() throws IOException {
+    public static void loadProperties(String standardLocation) throws IOException {
         Properties props = new Properties();
         InputStream is;
         File f;
         if (REINFORCEMENT_LEARNING) {
             f = new File("bot"+GameManager.getSharedInstance().getGameMap().getMyPlayerId()+".properties");
         } else {
-            f = new File("flock.properties");
+            f = new File(standardLocation);
         }
         is = new FileInputStream(f);
         props.load(is);

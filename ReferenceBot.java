@@ -1,12 +1,14 @@
-import hlt.*;
+import hlt.GameMap;
+import hlt.Log;
+import hlt.Networking;
 import main.boid.Flock;
 import main.model.GameManager;
 
-public class MyBot {
+public class ReferenceBot {
 
     public static void main(final String[] args) {
         Networking networking = new Networking();
-        GameMap gameMap = networking.initialize("Spaceinvader");
+        GameMap gameMap = networking.initialize("Reference");
 
         GameManager manager = GameManager.getSharedInstance();
         manager.initialize(gameMap, networking);
@@ -19,7 +21,7 @@ public class MyBot {
                 "; planets: " + gameMap.getAllPlanets().size();
         Log.log(initialMapIntelligence);
 
-        Flock flock = new Flock("flock.properties");
+        Flock flock = new Flock("reference.properties");
 
         while(true) {
             manager.prepareForNextMove();
