@@ -1,8 +1,9 @@
-import hlt.GameMap;
-import hlt.Log;
-import hlt.Networking;
+import hlt.*;
 import main.boid.Flock;
 import main.model.GameManager;
+import main.model.PropertyManager;
+
+import java.io.IOException;
 
 public class ReferenceBot {
 
@@ -16,12 +17,18 @@ public class ReferenceBot {
         // We now have 1 full minute to analyse the initial map.
         String initialMapIntelligence =
                 "width: " + gameMap.getWidth() +
-                "; height: " + gameMap.getHeight() +
-                "; players: " + gameMap.getAllPlayers().size() +
-                "; planets: " + gameMap.getAllPlanets().size();
+                        "; height: " + gameMap.getHeight() +
+                        "; players: " + gameMap.getAllPlayers().size() +
+                        "; planets: " + gameMap.getAllPlanets().size();
         Log.log(initialMapIntelligence);
 
-        Flock flock = new Flock("reference.properties");
+        try {
+            PropertyManager.loadProperties("reference.properties");
+        } catch (IOException e) {
+            throw new NullPointerException();
+        }
+
+        Flock flock = new Flock();
 
         while(true) {
             manager.prepareForNextMove();

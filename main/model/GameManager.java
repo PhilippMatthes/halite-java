@@ -96,4 +96,18 @@ public class GameManager {
                 .sorted(Comparator.comparing(ship -> ship.getDistanceTo(position)))
                 .collect(Collectors.toList());
     }
+
+    public static List<Planet> getWeakestEnemyPlanets(Position position) {
+        return GameManager.getSharedInstance().getGameMap().getAllPlanets().values().stream()
+                .filter(planet -> planet.getOwner() != GameManager.getSharedInstance().getGameMap().getMyPlayerId())
+                .sorted(Comparator.comparing(planet -> planet.getDockedShips().size()))
+                .collect(Collectors.toList());
+    }
+
+    public static List<Ship> getShipsDockedToPlanet(Planet planet) {
+        return GameManager.getSharedInstance().getGameMap().getAllShips().stream()
+                .filter(ship -> ship.getDockedPlanet() == planet.getId())
+                .sorted(Comparator.comparing(Entity::getHealth))
+                .collect(Collectors.toList());
+    }
 }

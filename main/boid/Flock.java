@@ -2,6 +2,7 @@ package main.boid;
 
 import hlt.*;
 import main.model.GameManager;
+import main.model.PropertyManager;
 import main.tactics.TargetManager;
 import main.util.Vector2d;
 
@@ -16,25 +17,9 @@ public class Flock {
     private List<Position> boids;
     private List<Position> obstacles;
 
-    private static boolean REINFORCEMENT_LEARNING = true;
-
-    private static double REGROUPING_FACTOR = 5;
-    private static double REGROUPING_RADIUS = Constants.SPAWN_RADIUS * 3;
-    private static double BOUNDING_FACTOR = 1;
-    private static double SEPERATION_DISTANCE = Constants.SPAWN_RADIUS;
-    private static double SEPERATION_FACTOR = 1;
-    private static double OBSTACLE_AVOIDANCE_DISTANCE = Constants.SPAWN_RADIUS * 3;
-    private static double OBSTACLE_AVOIDANCE_FACTOR = 5;
-    private static double POSITION_TEND_FACTOR = 1;
-
-    public Flock(String standardLocation) {
+    public Flock() {
         boids = new ArrayList<>();
         obstacles = new ArrayList<>();
-        try{
-            loadProperties(standardLocation);
-        } catch (IOException e) {
-            Log.log(Arrays.toString(e.getStackTrace()));
-        }
     }
 
     public void updateShips() {
@@ -71,15 +56,14 @@ public class Flock {
             if (entity instanceof Planet) {
                 Planet planet = (Planet) entity;
                 if (ship.canDock(planet) && ship.getDockingStatus() != Ship.DockingStatus.Docked && !planet.isFull()) {
-                    TargetManager.getSharedInstance().getTargets().put(ship, planet);
                     plannedMoves.add(new DockMove(ship, planet));
                     continue;
                 }
             }
 
             v1 = groupFlock(ship);
-            v21 = collisionAvoidance(ship, SEPERATION_DISTANCE, SEPERATION_FACTOR, boids);
-            v22 = collisionAvoidance(ship, OBSTACLE_AVOIDANCE_DISTANCE, OBSTACLE_AVOIDANCE_FACTOR, obstacles);
+            v21 = collisionAvoidance(ship, PropertyManager.SEPERATION_DISTANCE, PropertyManager.SEPERATION_FACTOR, boids);
+            v22 = collisionAvoidance(ship, PropertyManager.OBSTACLE_AVOIDANCE_DISTANCE, PropertyManager.OBSTACLE_AVOIDANCE_FACTOR, obstacles);
             v4 = bounding(ship);
             v5 = positionTend(ship, closestTarget);
 
@@ -95,7 +79,6 @@ public class Flock {
             Move moveTowardsTarget = createMoveForTarget(targetVector, ship);
 
             if (moveTowardsTarget != null) {
-                TargetManager.getSharedInstance().getTargets().put(ship, entity);
                 plannedMoves.add(moveTowardsTarget);
             }
 
@@ -151,7 +134,7 @@ public class Flock {
 
             Ship boidShip = (Ship) position;
 
-            if (ship.getDistanceTo(position) > REGROUPING_RADIUS) {
+            if (ship.getDistanceTo(position) > PropertyManager.REGROUPING_RADIUS) {
                 continue;
             }
 
@@ -164,7 +147,7 @@ public class Flock {
         }
         center = center.division(groupSize);
         center = center.subtract(getPositionAsVector(ship));
-        center = center.division(REGROUPING_FACTOR);
+        center = center.division(PropertyManager.REGROUPING_FACTOR);
 
         return center;
     }
@@ -207,7 +190,7 @@ public class Flock {
             bound.yPos += -1;
         }
 
-        bound = bound.division(BOUNDING_FACTOR);
+        bound = bound.division(PropertyManager.BOUNDING_FACTOR);
 
         return bound;
     }
@@ -216,63 +199,9 @@ public class Flock {
         Vector2d place = new Vector2d(target.getXPos(),target.getYPos());
 
         Vector2d tend = new Vector2d(place.subtract(getPositionAsVector(boidShip)));
-        tend.division(POSITION_TEND_FACTOR);
+        tend.division(PropertyManager.POSITION_TEND_FACTOR);
 
         return tend;
-    }
-
-    public static void loadProperties(String standardLocation) throws IOException {
-        Properties props = new Properties();
-        InputStream is;
-        File f;
-        if (REINFORCEMENT_LEARNING) {
-            f = new File("bot"+GameManager.getSharedInstance().getGameMap().getMyPlayerId()+".properties");
-        } else {
-            f = new File(standardLocation);
-        }
-        is = new FileInputStream(f);
-        props.load(is);
-
-        try {
-            REGROUPING_FACTOR = Double.parseDouble(props.getProperty("REGROUPING_FACTOR", ""));
-            REGROUPING_RADIUS = Double.parseDouble(props.getProperty("REGROUPING_RADIUS", ""));
-            BOUNDING_FACTOR = Double.parseDouble(props.getProperty("BOUNDING_FACTOR", ""));
-            SEPERATION_DISTANCE = Double.parseDouble(props.getProperty("SEPERATION_DISTANCE", ""));
-            SEPERATION_FACTOR = Double.parseDouble(props.getProperty("SEPERATION_FACTOR", ""));
-            OBSTACLE_AVOIDANCE_DISTANCE = Double.parseDouble(props.getProperty("OBSTACLE_AVOIDANCE_DISTANCE", ""));
-            OBSTACLE_AVOIDANCE_FACTOR = Double.parseDouble(props.getProperty("OBSTACLE_AVOIDANCE_FACTOR", ""));
-            POSITION_TEND_FACTOR = Double.parseDouble(props.getProperty("POSITION_TEND_FACTOR", ""));
-        } catch (NumberFormatException e) {
-            Log.log(Arrays.toString(e.getStackTrace()));
-        }
-        is.close();
-    }
-
-    public void storeProperties() {
-        try {
-            Properties props = new Properties();
-            props.setProperty("REGROUPING_FACTOR", String.format("%s", REGROUPING_FACTOR));
-            props.setProperty("REGROUPING_RADIUS", String.format("%s", REGROUPING_RADIUS));
-            props.setProperty("BOUNDING_FACTOR", String.format("%s", BOUNDING_FACTOR));
-            props.setProperty("SEPERATION_DISTANCE", String.format("%s", SEPERATION_DISTANCE));
-            props.setProperty("SEPERATION_FACTOR", String.format("%s", SEPERATION_FACTOR));
-            props.setProperty("OBSTACLE_AVOIDANCE_DISTANCE", String.format("%s", OBSTACLE_AVOIDANCE_DISTANCE));
-            props.setProperty("OBSTACLE_AVOIDANCE_FACTOR", String.format("%s", OBSTACLE_AVOIDANCE_FACTOR));
-            props.setProperty("POSITION_TEND_FACTOR", String.format("%s", POSITION_TEND_FACTOR));
-
-            File f;
-            if (REINFORCEMENT_LEARNING) {
-                f = new File("bot"+GameManager.getSharedInstance().getGameMap().getMyPlayerId()+".properties");
-            } else {
-                f = new File("flock.properties");
-            }
-
-            OutputStream out = new FileOutputStream( f );
-            props.store(out, "This is the Flock Properties File used for Reinforcement Learning!");
-        }
-        catch (Exception e ) {
-            Log.log(Arrays.toString(e.getStackTrace()));
-        }
     }
 
 }

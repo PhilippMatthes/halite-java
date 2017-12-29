@@ -1,6 +1,9 @@
 import hlt.*;
 import main.boid.Flock;
 import main.model.GameManager;
+import main.model.PropertyManager;
+
+import java.io.IOException;
 
 public class MyBot {
 
@@ -19,7 +22,13 @@ public class MyBot {
                 "; planets: " + gameMap.getAllPlanets().size();
         Log.log(initialMapIntelligence);
 
-        Flock flock = new Flock("flock.properties");
+        try {
+            PropertyManager.loadProperties("flock.properties");
+        } catch (IOException e) {
+            throw new NullPointerException();
+        }
+
+        Flock flock = new Flock();
 
         while(true) {
             manager.prepareForNextMove();

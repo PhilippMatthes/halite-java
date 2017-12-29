@@ -12,9 +12,9 @@ path_to_bot = "MyBot"
 run_bot_command = "java " + path_to_bot
 map_height = 160
 map_width = 240
-tries = 10
+tries = 25
 
-randomization = 0.1
+randomization = 0.2
 
 number_of_threads = 8
 
@@ -43,7 +43,7 @@ def task():
 
 
 def generate_randomized_values():
-    for botNumber in range(4):
+    for botNumber in range(3):
         properties = load_properties("bot" + str(botNumber) + ".properties")
 
         f = open("bot" + str(botNumber) + ".properties", "w")
@@ -80,11 +80,11 @@ if __name__ == "__main__":
 
     training_round = 0
 
+    os.system("javac MyBot.java")
+
     while True:
         print("Launching training round: "+str(training_round))
         print("Running with "+str(number_of_threads)+" threads and training "+str(tries)+" rounds.")
-
-        os.system("javac MyBot.java")
 
         generate_randomized_values();
 
@@ -107,10 +107,10 @@ if __name__ == "__main__":
 
         leading_bot = most_common(chained_winners_as_numbers)
 
-        for botNumber in range(4):
+        for botNumber in range(3):
             if leading_bot != botNumber:
                 copyfile("bot" + str(leading_bot) + ".properties", "bot" + str(botNumber) + ".properties")
 
         print("Bot "+str(leading_bot)+" won the competition. He will now overtake.")
 
-        os.system("find . -name \*.hlt -delete; find . -name \*.log -delete; find . -name \*.class -delete")
+        os.system("find . -name \*.hlt -delete; find . -name \*.log -delete")
