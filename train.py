@@ -114,3 +114,5 @@ if __name__ == "__main__":
         print("Bot "+str(leading_bot)+" won the competition. He will now overtake.")
 
         os.system("find . -name \*.hlt -delete; find . -name \*.log -delete")
+
+        training_round += 1;

@@ -4,6 +4,7 @@ import hlt.*;
 import main.model.GameManager;
 import main.model.PropertyManager;
 import main.tactics.TargetManager;
+import main.tactics.TargetQueue;
 import main.util.Vector2d;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -51,6 +52,8 @@ public class Flock {
             Ship ship = (Ship) shipPosition;
 
             Entity entity = TargetManager.selectTarget(ship);
+            if (entity == null) continue;
+
             Position closestTarget = ship.getClosestPoint(entity);
 
             if (entity instanceof Planet) {
@@ -84,7 +87,7 @@ public class Flock {
 
         }
 
-        TargetManager.getSharedInstance().getTargets().clear();
+        TargetQueue.getSharedInstance().flush();
 
         return plannedMoves;
     }

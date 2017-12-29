@@ -18,9 +18,14 @@ public class GameManager {
 
     private GameMap gameMap;
     private Networking networking;
+    private int round = 0;
 
     private GameManager() {
         // Singleton constructor
+    }
+
+    public int getRound() {
+        return round;
     }
 
     /**
@@ -57,6 +62,7 @@ public class GameManager {
      */
     public void prepareForNextMove() {
         networking.updateMap(gameMap);
+        round += 1;
     }
 
 
@@ -77,6 +83,13 @@ public class GameManager {
                 .collect(Collectors.toList());
     }
 
+    public static List<Planet> getPlanetsWithSpareProduction(Position position) {
+        return GameManager.getSharedInstance().getGameMap().getAllPlanets().values().stream()
+                .filter(planet -> planet.getDockingSpots() < planet.getDockedShips().size() && planet.getOwner() == GameManager.getSharedInstance().getGameMap().getMyPlayerId())
+                .sorted(Comparator.comparing(planet -> planet.getDistanceTo(position)))
+                .collect(Collectors.toList());
+    }
+
     public static List<Planet> getAvailablePlanets(Position position) {
         return GameManager.getSharedInstance().getGameMap().getAllPlanets().values().stream()
                 .filter(planet -> planet.getOwner() != GameManager.getSharedInstance().getGameMap().getMyPlayerId())
@@ -84,7 +97,7 @@ public class GameManager {
                 .collect(Collectors.toList());
     }
 
-    public static List<Planet> getAllPlanets(Position position) {
+    public static List<Planet> getNearestPlanets(Position position) {
         return GameManager.getSharedInstance().getGameMap().getAllPlanets().values().stream()
                 .sorted(Comparator.comparing(planet -> planet.getDistanceTo(position)))
                 .collect(Collectors.toList());
@@ -97,7 +110,15 @@ public class GameManager {
                 .collect(Collectors.toList());
     }
 
-    public static List<Planet> getWeakestEnemyPlanets(Position position) {
+    public static List<Planet> getWeakEnemyPlanetsByNumberOfDockedShips(Position position, int numberOfDockedShips) {
+        return GameManager.getSharedInstance().getGameMap().getAllPlanets().values().stream()
+                .filter(planet -> planet.getOwner() != GameManager.getSharedInstance().getGameMap().getMyPlayerId())
+                .filter(planet -> planet.getDockedShips().size() == numberOfDockedShips)
+                .sorted(Comparator.comparing(planet -> planet.getRadius()))
+                .collect(Collectors.toList());
+    }
+
+    public static List<Planet> getWeakEnemyPlanets(Position position) {
         return GameManager.getSharedInstance().getGameMap().getAllPlanets().values().stream()
                 .filter(planet -> planet.getOwner() != GameManager.getSharedInstance().getGameMap().getMyPlayerId())
                 .sorted(Comparator.comparing(planet -> planet.getDockedShips().size()))
@@ -109,5 +130,12 @@ public class GameManager {
                 .filter(ship -> ship.getDockedPlanet() == planet.getId())
                 .sorted(Comparator.comparing(Entity::getHealth))
                 .collect(Collectors.toList());
+    }
+
+    public static int getMaxNumberOfDockedShips() {
+        List<Planet> planets = GameManager.getSharedInstance().getGameMap().getAllPlanets().values().stream()
+                .sorted(Comparator.comparing(planet -> planet.getDockedShips().size()))
+                .collect(Collectors.toList());
+        return planets.get(planets.size() - 1).getDockedShips().size();
     }
 }

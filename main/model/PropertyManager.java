@@ -54,33 +54,4 @@ public class PropertyManager {
         is.close();
     }
 
-    /*
-    public void storeProperties() {
-        try {
-            Properties props = new Properties();
-            props.setProperty("REGROUPING_FACTOR", String.format("%s", REGROUPING_FACTOR));
-            props.setProperty("REGROUPING_RADIUS", String.format("%s", REGROUPING_RADIUS));
-            props.setProperty("BOUNDING_FACTOR", String.format("%s", BOUNDING_FACTOR));
-            props.setProperty("SEPERATION_DISTANCE", String.format("%s", SEPERATION_DISTANCE));
-            props.setProperty("SEPERATION_FACTOR", String.format("%s", SEPERATION_FACTOR));
-            props.setProperty("OBSTACLE_AVOIDANCE_DISTANCE", String.format("%s", OBSTACLE_AVOIDANCE_DISTANCE));
-            props.setProperty("OBSTACLE_AVOIDANCE_FACTOR", String.format("%s", OBSTACLE_AVOIDANCE_FACTOR));
-            props.setProperty("POSITION_TEND_FACTOR", String.format("%s", POSITION_TEND_FACTOR));
-
-            File f;
-            if (REINFORCEMENT_LEARNING) {
-                f = new File("bot"+GameManager.getSharedInstance().getGameMap().getMyPlayerId()+".properties");
-            } else {
-                f = new File("flock.properties");
-            }
-
-            OutputStream out = new FileOutputStream( f );
-            props.store(out, "This is the Flock Properties File used for Reinforcement Learning!");
-        }
-        catch (Exception e ) {
-            Log.log(Arrays.toString(e.getStackTrace()));
-        }
-    }
-    */
-
 }
