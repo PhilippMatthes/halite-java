@@ -23,7 +23,8 @@ public class TargetManager {
 
         Entity target = null;
 
-        target = TargetFinder.targetFreePlanet(ship);
+        target = TargetFinder.targetNearEnemiesInProximityOfPlanets(ship);
+        if (target == null) target = TargetFinder.targetFreePlanet(ship);
         if (target == null) target = TargetFinder.targetPlanetWithFreeDockingSpots(ship);
         if (target == null) target = TargetFinder.targetWeakPlanetsByDockedShips(ship);
         if (target == null) target = TargetFinder.targetEnemiesShip(ship);

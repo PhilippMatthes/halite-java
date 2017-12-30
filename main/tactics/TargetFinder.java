@@ -5,10 +5,21 @@ import hlt.Planet;
 import hlt.Position;
 import hlt.Ship;
 import main.model.GameManager;
+import main.model.PropertyManager;
 
 import java.util.List;
 
 public class TargetFinder {
+
+    public static Ship targetNearEnemiesInProximityOfPlanets(Ship ship) {
+        if (ship == null) return null;
+        for (Ship enemyShip : GameManager.getAllHostileProximalShips()) {
+            if (!TargetQueue.getSharedInstance().targetCapacityIsFull(enemyShip.getId(), TargetType.SHIP)) {
+                if (enemyShip.getDistanceTo(ship) < PropertyManager.DEFENSE_ACTION_RADIUS) return GameManager.getPredictedEnemyShip(enemyShip);
+            }
+        }
+        return null;
+    }
 
     public static Ship targetEnemiesShip(Ship ship) {
         if (ship == null) return null;
@@ -57,7 +68,9 @@ public class TargetFinder {
         if (ship == null) return null;
         for (Planet planet : GameManager.getPlanetsWithSpareProduction(ship)) {
             if (!TargetQueue.getSharedInstance().targetCapacityIsFull(planet.getId(), TargetType.PLANET)) {
-                return planet;
+                if (ship.canDock(planet)) return planet;
+                if (!GameManager.enemyInProximityOfPlanet(planet)) return planet;
+                if (GameManager.getEnemyShipsInProximityOfPlanet(planet).size() < GameManager.getOwnShipsInProximityOfPlanet(planet).size()) return planet;
             }
         }
         return null;

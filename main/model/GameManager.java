@@ -180,6 +180,12 @@ public class GameManager {
                 .collect(Collectors.toList());
     }
 
+    public static List<Ship> getEnemyShips() {
+        return GameManager.getSharedInstance().getGameMap().getAllShips().stream()
+                .filter(ship -> ship.getOwner() != GameManager.getSharedInstance().getGameMap().getMyPlayerId())
+                .collect(Collectors.toList());
+    }
+
     public static List<Planet> getWeakEnemyPlanetsByNumberOfDockedShips(Position position, int numberOfDockedShips) {
         return GameManager.getSharedInstance().getGameMap().getAllPlanets().values().stream()
                 .filter(planet -> planet.getOwner() != GameManager.getSharedInstance().getGameMap().getMyPlayerId())
@@ -207,5 +213,34 @@ public class GameManager {
                 .sorted(Comparator.comparing(planet -> planet.getDockedShips().size()))
                 .collect(Collectors.toList());
         return planets.get(planets.size() - 1).getDockedShips().size();
+    }
+
+    public static List<Ship> getEnemyShipsInProximityOfPlanet(Planet planet) {
+        return GameManager.getSharedInstance().getGameMap().getAllShips().stream()
+                .filter(ship -> ship.getOwner() != GameManager.getSharedInstance().getGameMap().getMyPlayerId())
+                .filter(ship -> ship.getDistanceTo(planet) < planet.getRadius() + PropertyManager.DEFENSE_ACTION_RADIUS)
+                .collect(Collectors.toList());
+    }
+
+    public static List<Ship> getOwnShipsInProximityOfPlanet(Planet planet) {
+        return GameManager.getSharedInstance().getGameMap().getAllShips().stream()
+                .filter(ship -> ship.getOwner() == GameManager.getSharedInstance().getGameMap().getMyPlayerId())
+                .filter(ship -> ship.getDistanceTo(planet) < planet.getRadius() + PropertyManager.DEFENSE_ACTION_RADIUS)
+                .collect(Collectors.toList());
+    }
+
+    public static boolean enemyInProximityOfPlanet(Planet planet) {
+        return !getEnemyShips().stream()
+                .filter(ship -> planet.getDistanceTo(ship) < PropertyManager.SAFE_DOCKING_RADIUS)
+                .collect(Collectors.toList())
+                .isEmpty();
+    }
+
+    public static List<Ship> getAllHostileProximalShips() {
+        List<Ship> ships = new ArrayList<>();
+        for (Planet planet : GameManager.getSharedInstance().getGameMap().getAllPlanets().values()) {
+            ships.addAll(getEnemyShipsInProximityOfPlanet(planet));
+        }
+        return ships;
     }
 }

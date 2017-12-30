@@ -11,6 +11,9 @@ public class PropertyManager {
 
     public static boolean REINFORCEMENT_LEARNING = false;
 
+    public static double DEFENSE_ACTION_RADIUS = 40;
+    public static double SAFE_DOCKING_RADIUS = 40;
+
     public static double REGROUPING_FACTOR = 5;
     public static double REGROUPING_RADIUS = Constants.SPAWN_RADIUS * 3;
     public static double BOUNDING_FACTOR = 1;
