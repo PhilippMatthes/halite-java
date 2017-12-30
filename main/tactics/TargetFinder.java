@@ -1,6 +1,8 @@
 package main.tactics;
 
+import hlt.Log;
 import hlt.Planet;
+import hlt.Position;
 import hlt.Ship;
 import main.model.GameManager;
 
@@ -12,7 +14,7 @@ public class TargetFinder {
         if (ship == null) return null;
         for (Ship enemyShip : GameManager.getEnemyShips(ship)) {
             if (!TargetQueue.getSharedInstance().targetCapacityIsFull(enemyShip.getId(), TargetType.SHIP)) {
-                return enemyShip;
+                return GameManager.getPredictedEnemyShip(enemyShip);
             }
         }
         return null;

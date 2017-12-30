@@ -36,6 +36,7 @@ public class MyBot {
             flock.updateObstacles();
 
             Networking.sendMoves(flock.planMoves());
+            manager.finishCurrentMove();
         }
     }
 }

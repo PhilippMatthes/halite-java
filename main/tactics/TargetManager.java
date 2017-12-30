@@ -33,7 +33,7 @@ public class TargetManager {
         if (target instanceof Planet) {
             Planet planet = (Planet) target;
             targetQueue.addTarget(target.getId(), ship.getId(), planet.getDockingSpots() - planet.getDockedShips().size(), TargetType.PLANET);
-        } else if (target instanceof Ship) {
+        } else if (target != null) {
             targetQueue.addTarget(target.getId(), ship.getId(), 3, TargetType.SHIP);
         }
 

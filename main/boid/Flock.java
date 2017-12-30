@@ -99,8 +99,8 @@ public class Flock {
                 new Position(targetVector.xPos, targetVector.yPos),
                 Constants.MAX_SPEED,
                 true,
-                Constants.MAX_NAVIGATION_CORRECTIONS - 1,
-                Math.PI/180.0
+                GameManager.getSharedInstance().getMaxCorrections(),
+                GameManager.getSharedInstance().getAngularStepRad()
         );
 
         if (moveTowardsTarget != null) {
@@ -112,8 +112,8 @@ public class Flock {
                     new Position(targetVector.xPos, targetVector.yPos),
                     Constants.MAX_SPEED,
                     false,
-                    Constants.MAX_NAVIGATION_CORRECTIONS - 1,
-                    Math.PI/180.0
+                    GameManager.getSharedInstance().getMaxCorrections(),
+                    GameManager.getSharedInstance().getAngularStepRad()
             );
 
             if (moveTowardsTarget != null) {
